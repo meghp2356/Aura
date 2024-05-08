@@ -6,8 +6,13 @@ import CustomButton from "../components/CustomButton"
 import { StatusBar } from "expo-status-bar";
 
 import { images } from "../constants";
+import { useGlobaleContext } from "../context/GlobaleProvider";
 
 const Index = () => {
+  const {isLoading , isLoggedIn} = useGlobaleContext()
+
+  console.log(isLoading,isLoggedIn)
+  if(!isLoading && isLoggedIn) return (<Redirect href="home"/>)
   return (
     <SafeAreaView className=" bg-primary h-full">
       <ScrollView contentContainerStyle={{  height: "100%" }}>

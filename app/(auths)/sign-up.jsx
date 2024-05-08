@@ -1,11 +1,13 @@
-import { View, Text, ScrollView, Image } from "react-native";
+import { View, Text, ScrollView, Image, Alert } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import FormField from "../../components/FormField";
 import CustomButton from "../../components/CustomButton";
+import { CreateUser } from "../../lib/appwrite";
 
 import { images } from "../../constants";
+import { useGlobaleContext } from "../../context/GlobaleProvider";
 
 const SignUp = () => {
   const [form, setform] = useState({
@@ -15,8 +17,30 @@ const SignUp = () => {
   });
 
   const [isSubmitting, setisSubmitting] = useState(false);
+  const {setUser,setisLoggedIn} = useGlobaleContext()
 
-  const submit = () => {};
+  const submit = async () => {
+    if(!form.username || !form.email || !form.password){
+      Alert.alert('Error',"please fill al the fields")
+    }
+
+    setisSubmitting(true)
+
+    try {
+        const user = await CreateUser(form);
+
+        // set it to golabe state....
+        setUser(user)
+        setisLoggedIn(true)
+
+        router.replace("/home")
+    } catch (error) {
+      Alert.alert('Error',error.message)
+    } finally {
+      setisSubmitting(false)
+    }
+  };
+  
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView>
@@ -35,7 +59,7 @@ const SignUp = () => {
             title="Username"
             value={form.username}
             handleChangeText={(e) => {
-              setform({ username: e });
+              setform({  ...form ,username: e });
             }}
             style="mt-7"
             keybordType="email-address"
@@ -44,7 +68,7 @@ const SignUp = () => {
             title="Email"
             value={form.email}
             handleChangeText={(e) => {
-              setform({ email: e });
+              setform({ ...form ,email: e });
             }}
             style="mt-7"
             keybordType="email-address"
@@ -53,7 +77,7 @@ const SignUp = () => {
             title="Password"
             value={form.password}
             handleChangeText={(e) => {
-              setform({ password: e });
+              setform({ ...form , password: e });
             }}
             style="mt-7"
           />
